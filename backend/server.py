@@ -36,6 +36,35 @@ def add_product():
 @app.route('/product-images/<path:filename>')
 def get_image(filename):
     return send_from_directory('product-images', filename)
-        
+
+@app.route('/products/<int:product_id>', methods=['PUT'])
+def update_product(product_id):
+    new_product = request.json
+    products = load_products()
+    for product in products:
+        if product['id'] == product_id:
+            
+            np_keys = list(new_product.keys())
+            for key in np_keys:
+                product[key] = new_product[key]
+            
+            with open('products.json', 'w') as f:
+                json.dump({"products": products}, f)
+            return "Updated", 200
+    
+    return "NotFound", 404
+
+
+@app.route('/products/delete/<int:product_id>', methods=['DELETE'])
+def delete_product(product_id):
+    products = load_products()
+    for product in products:
+        if product['id'] == product_id:
+            products.remove(product)
+    with open('products.json', 'w') as f:
+        json.dump({"products": products}, f)
+    return 'Deleted', 200       
+
+  
 if __name__ == "__main__":
     app.run(debug=True)
