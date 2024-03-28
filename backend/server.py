@@ -1,27 +1,29 @@
 from flask import Flask, request, jsonify, send_from_directory
+from flask_cors import CORS
 import json
 import os
 
 app = Flask(__name__)
-
+CORS(app)
 def load_products():
     with open('products.json', 'r') as f:
         return json.load(f)['products']
     
-@app.route('/products', methods=['GET})'])
+@app.route('/products', methods=['GET'])
 @app.route('/products/<int:product_id>', methods=['GET'])
 def get_products(product_id=None):
     products = load_products()
     if product_id is None:
-        # Return all products wrapped in an object with a 'products ' key
+        # Return all products wrapped in an object with a 'products' key
         return jsonify({"products": products})
     else:
         product = next((p for p in products if p['id'] == product_id), None)
-        # If a specific product is requested ,
-        # wrap it in an object with a 'products ' key
+        # If a specific product is requested,
+        # wrap it in an object with a 'products' key
         # Note: You might want to change this
         # if you want to return a single product not wrapped in a list
         return jsonify(product) if product else ('', 404)
+
 
 @app.route('/products/add', methods=['POST'])
 def add_product():
@@ -55,7 +57,7 @@ def update_product(product_id):
     return "NotFound", 404
 
 
-@app.route('/products/delete/<int:product_id>', methods=['DELETE'])
+@app.route('/products/<int:product_id>', methods=['DELETE'])
 def delete_product(product_id):
     products = load_products()
     for product in products:
